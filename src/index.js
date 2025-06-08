@@ -3,6 +3,7 @@ const rateLimit = require('express-rate-limit');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const { ServerConfig } = require('./config');
 const apiRoutes = require('./routes');
+const role = require('./models/role');
 
 const app = express();
 
@@ -34,7 +35,10 @@ app.use('/BookingService', createProxyMiddleware({
 
 app.use('/api', apiRoutes);
 
-app.listen(ServerConfig.PORT, () => {
+app.listen(ServerConfig.PORT, async () => {
     console.log(`Successfully started the server on PORT : ${ServerConfig.PORT}`);
-    
+    // user = await User.findByPk(6);
+    // role = await role.findByPk(1);
+    // console.log(role, user);
+    // user.addRole(role);
 });
