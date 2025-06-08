@@ -3,6 +3,7 @@ const { StatusCodes } = require('http-status-codes');
 const { UserRepository, RoleRepository} = require('../repositories');
 const AppError = require('../utils/errors/app-error');
 const { Auth, Enums } = require('../utils/common');
+const user = require('../models/user');
 const userRepo = new UserRepository();
 const roleRepo = new RoleRepository();
 
@@ -70,11 +71,34 @@ async function signin(data){
            }
            console.log(error);
            throw new AppError('something went wrong', StatusCodes.INTERNAL_SERVER_ERROR);
-       }
+       }  
+  }
+
+  async function addRoleToUser(data){
+    try{
+        const user = await userRepo.get(id);
+        if(!user){
+            throw new AppError("User not found for the given id", StatusCodes.NOT_FOUND);
+        }
+        const role = await roleRepo.getRoleByName(data.role);
+        if(!role){
+            throw new AppError("no user found for the given role", StatusCodes.NOT_FOUND);
+        }
+        user.addRole(role);
+        return user;
+    }
+    catch(error){
+        if(error instanceof AppError){
+            throw error;
+        }
+        console.log(error);
+        throw new AppError('something went wrong', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   }
 
 module.exports = {
     create,
     signin,
-    isAuthenticated
+    isAuthenticated,
+    addRoleToUser
 }
