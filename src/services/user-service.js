@@ -76,7 +76,7 @@ async function signin(data){
 
   async function addRoleToUser(data){
     try{
-        const user = await userRepo.get(id);
+        const user = await userRepo.get(data.id);
         if(!user){
             throw new AppError("User not found for the given id", StatusCodes.NOT_FOUND);
         }
@@ -96,9 +96,31 @@ async function signin(data){
     }
   }
 
+  async function isAdmin(id){
+       try{
+        const user = await userRepo.get(id);
+        if(!user){
+            throw new AppError("User not found for the given id", StatusCodes.NOT_FOUND);
+        }
+        const adminrole = await roleRepo.getRoleByName(Enums.USER_ROLES_ENUMS.ADMIN);
+        if(!adminrole){
+            throw new AppError("no user found for the given role", StatusCodes.NOT_FOUND);
+        }
+        return user.hasRole(adminrole);
+    }
+    catch(error){
+        if(error instanceof AppError){
+            throw error;
+        }
+        console.log(error);
+        throw new AppError('something went wrong', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 module.exports = {
     create,
     signin,
     isAuthenticated,
-    addRoleToUser
+    addRoleToUser,
+    isAdmin
 }
